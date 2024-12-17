@@ -1,0 +1,398 @@
+:root {
+    --green: #34C759;
+    --orange: #E6B127;
+    --red: #F06A4D;
+    --firm: #9873FF;
+    --firm-light: #B89EFF;
+    --firm-dark: #8052FF;
+    --grey: #C8C5D1;
+    --txt-grey: #B0B0B0;
+    --black: #333333;
+}
+
+.modal {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    background-color: rgba(51, 51, 51, 0.6);
+    overflow: auto;
+    opacity: 1;
+    transition: opacity 0.5s; 
+}
+.modal.closed {
+    opacity: 0;
+}
+
+.modal__content {
+    width: 100%;
+    min-height: 100%;
+    padding: 20px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal__window {
+    width: 100%;
+    max-width: 450px;
+    background-color: white;
+    padding: 22px 30px 27px;
+    position: relative;
+    top: 0px;
+    opacity: 1;
+    transition: top 0.5s, opacity 0.5s;
+    margin: 20px auto;
+    flex-shrink: 0;
+}
+.modal__window.closed {
+    top: -50px;
+    opacity: 0;
+}
+
+.modal__window_delete {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal__window__header {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--black);
+    margin-bottom: 11px;
+    text-align: center;
+}
+.modal__window__message {
+    max-width: 275px;
+    font-size: 14px;
+    font-weight: 400;
+    text-align: center;
+    color: var(--black);
+    margin-bottom: 25px;
+}
+
+.form {
+    padding: 0px;
+}
+
+.form__close-button {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: block;
+    width: 29px;
+    height: 29px;
+    background-image: url("../icons/close.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.form__close-button:hover {
+    cursor: pointer;
+}
+
+.form__name-inputs {
+    padding: 24px 30px 26px;
+}
+
+.form__header {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--black);
+    margin-bottom: 15px;
+}
+.header_text-light {
+    font-weight: 400;
+    color: var(--txt-grey);
+    font-size: 12px;
+    margin-left: 9px;
+    text-wrap: nowrap;
+}
+
+.form__name-input-content {
+    width: 100%;
+    height: 41px;
+    margin-bottom: 15px;
+    position: relative;
+}
+.form__name-input-content:last-child {
+    margin-bottom: 0px;
+}
+
+.form__name-label {
+    position: absolute;
+    top: 16px;
+    left: 0px;
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--grey);
+    transition: all 0.3s;
+    pointer-events: none;
+}
+
+.form__name-input:focus ~ .form__name-label,
+.form__name-label_small {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    font-size: 10px;
+}
+
+.form__name-input {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    padding-top: 10px;
+    border-bottom: 1px solid var(--grey);
+    font-size: 14px;
+    font-weight: 600;
+    vertical-align: bottom;
+}
+
+.form__name-input__underline {
+    display: block;
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    height: 2px;
+    background-color: var(--firm);
+    width: 0px;
+    transition: width 0.3s;
+}
+.form__name-input:focus ~ .form__name-input__underline {
+    width: 100%;
+}
+
+.form__contacts {
+    background-color: rgba(200, 197, 209, 0.2);
+    width: 100%;
+    padding: 25px 30px 17px;
+}
+.form__contacts.no-inputs {
+    padding: 0px 30px;
+}
+
+.form__contacts__input-content {
+    width: 100%;
+    height: 37px;
+    display: flex;
+    margin-bottom: 15px;
+}
+.form__contacts__input-content:last-of-type {
+    margin-bottom: 8px;
+}
+
+.form__contacts__select {
+    height: 100%;
+    width: 123px;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.form__contacts__select__toggle {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--grey);
+    background-color: #E7E5EB;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--black);
+    text-align: left;
+}
+.form__contacts__select__toggle:hover {
+    cursor: pointer;
+}
+
+.form__contacts__select__arrow {
+    pointer-events: none;
+    width: 12px;
+    height: 12px;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    top: 13px;
+    right: 8px;
+}
+.arrow-icon {
+    background-image: url('../icons/select-arrow.svg');
+}
+.arrow-icon_up {
+    transform: rotateX(180deg);
+}
+
+.form__contacts__select__options {
+    position: absolute;
+    background-color: #F4F3F6;
+    width: 100%;
+    overflow: hidden;
+    padding: 0px;
+    height: 0px;
+    border: none;
+}
+.form__contacts__select__options.opened {
+    height: auto;
+    border: 1px solid var(--grey);
+    border-top: none;
+    padding: 6px 0px;
+    z-index: 110;
+}
+
+.form__contacts__select__option {
+    width: 100%;
+    text-align: left;
+    height: 26px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--black);
+}
+.form__contacts__select__option:hover,
+.form__contacts__select__option.active {
+    cursor: pointer;
+    background-color: #E7E5EB;
+}
+
+.form__contacts__input {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    padding-left: 12px;
+    padding-right: 12px;
+    border-top: 1px solid var(--grey);
+    border-bottom: 1px solid var(--grey);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--black);
+    background-color: transparent;
+    outline-color: transparent;
+    transition: background 0.3s, outline-color 0.3s;
+}
+.form__contacts__input::placeholder {
+    font-weight: 400;
+    color: var(--txt-grey);
+}
+.form__contacts__input:focus {
+    outline: 2px solid var(--firm);
+    outline-offset: -2px;
+    background-color: #ffffff;
+} 
+
+.form__contacts__delete-button {
+    display: inline-block;
+    width: 26px;
+    flex-shrink: 0;
+    height: 100%;
+    border: 1px solid var(--grey);
+    transition: border 0.3s;
+}
+.form__contacts__delete-button:hover {
+    cursor: pointer;
+    border-color: var(--red);
+}
+.form__contacts__delete-button > span::before {
+    margin-right: 0px;
+    background-image: url("../icons/delete_grey.svg");
+}
+.form__contacts__delete-button:hover > span::before {
+    background-image: url("../icons/delete_red.svg");
+}
+
+.form__contacts__add-button {
+    margin-top: 17px;
+    display: block;
+    padding: 8px 0px;
+    width: 180px;
+    margin-right: auto;
+    margin-left: auto;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--black);
+    transition: color 0.3s;
+}
+.form__contacts__add-button:hover {
+    cursor: pointer;
+    color: var(--firm);
+}
+.form__contacts.no-inputs .form__contacts__add-button {
+    margin-top: 0px;
+}
+
+.form__contacts__add-button > span::before {
+    background-image: url("../icons/add_firm.svg");
+}
+.form__contacts__add-button:hover > span::before {
+    background-image: url("../icons/add_firm_active.svg");
+}
+
+.form__buttons {
+    width: 100%;
+    padding-top: 8px;
+    padding-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.form__error-message {
+    min-height: 8px;
+    width: 100%;
+    max-width: 255px;
+    font-size: 10px;
+    color: var(--red);
+    margin-bottom: 9px;
+    text-align: center;
+    padding: 0px 15px;
+}
+
+.form__submit-button {
+    margin-bottom: 5px;
+}
+.form__submit-button.loading {
+    background-color: var(--firm-dark);
+}
+.form__submit-button > span::before {
+    display: none;
+}
+.form__submit-button.loading > span::before {
+    display: inline-block;
+    background-image: url("../icons/loading_firm-light.svg");
+}
+
+.form__cancel-button {
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--black);
+    text-decoration: underline;
+    text-wrap: nowrap;
+}
+.form__cancel-button:hover {
+    cursor: pointer;
+}
+
+[hidden] {
+    display: none;
+}
+
+@media (max-width: 400px) {
+    .form__contacts__select {
+        width: 110px;
+    }
+    .form__contacts__input {
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+    .form__close-button {
+        top: 3px;
+        right: 3px;
+    }
+    .form__name-inputs,
+    .form__contacts {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+}

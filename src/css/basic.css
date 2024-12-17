@@ -1,0 +1,80 @@
+:root {
+    --green: #34C759;
+    --orange: #E6B127;
+    --red: #F06A4D;
+    --firm: #9873FF;
+    --firm-light: #B89EFF;
+    --firm-dark: #8052FF;
+    --grey: #C8C5D1;
+    --txt-grey: #B0B0B0;
+    --black: #333333;
+}
+
+.button {
+    display: inline-block;
+    height: 44px;
+    padding: 0px 35px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: color 0.3s, background-color 0.3s;
+}
+.button:hover {
+    cursor: pointer;
+    background-color: var(--firm-light);
+    color: #ffffff;
+}
+.button:active {
+    color: #ffffff;
+    background-color: var(--firm-dark);
+}
+
+.button_primary {
+    color: #ffffff;
+    background-color: var(--firm);
+}
+.button_primary:disabled {
+    background-color: var(--grey);
+}
+
+.button_secondary {
+    background-color: transparent;
+    border: 1px solid var(--firm);
+    color: var(--firm);
+}
+.button_secondary:disabled {
+    color: var(--grey);
+    border-color: var(--grey);
+}
+
+.button_with-icon > span::before {
+    content: "";
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin-right: 4px;
+    margin-bottom: 2px;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background 0.3s;
+}
+
+.text-grey-color {
+    color: var(--txt-grey);
+}
+
+.text-firm-color {
+    color: var(--firm);
+}
+
+.text-nowrap {
+    text-wrap: nowrap;
+}
+
+.text-bold {
+    font-weight: 700;
+}
+
+.loading {
+    pointer-events: none;
+}
