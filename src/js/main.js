@@ -3,35 +3,39 @@ import * as modal from './modal.js';
 import state from './state.js';
 import * as table from './table.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Обновляем таблицу (внутри уже есть запрос на сервер)
-  table.updateTable();
+const SEARCH_DEBOUNCE_DELAY = 300;
 
-  //Добавляем функционал кнопкам сортировки
-  const tableHeader = document.getElementById('table-header');
-  tableHeader.querySelectorAll('[data-element-sortButton]').forEach((button) => {
-    button.addEventListener('click', table.handleSortButton);
-  })
+const initSortButtons = () => {
+  document.getElementById('table-header')
+    .querySelectorAll('[data-element-sortButton]')
+    .forEach(button => button.addEventListener('click', table.handleSortButton));
+};
 
-  // Добавляем функционал кнопки добавления клиента
-  const addClientButton = document.getElementById('add-client-button');
-  addClientButton.addEventListener('click', modal.handleOpenAddClientModal);
-
-  // Настраиваем поле поиска
+const initSearchField = () => {
   const searchInput = document.getElementById('search-input');
   searchInput.addEventListener('keypress', basic.keypressNoDubbleSpaces);
-  searchInput.addEventListener('input', handleSearchUser);
-});
+  searchInput.addEventListener('input', debounceSearch);
+};
 
-// Обновляет таблицу при вводепоискового запроса
-function handleSearchUser() {
+const debounceSearch = () => {
   state().lastInput = Date.now();
   setTimeout(() => {
-    if (Date.now() - state().lastInput >= 300) {
+    if (Date.now() - state().lastInput >= SEARCH_DEBOUNCE_DELAY) {
       table.updateTable();
     }
-  }, 300);
-}
+  }, SEARCH_DEBOUNCE_DELAY);
+};
 
+const initAddClientButton = () => {
+  document.getElementById('add-client-button')
+    .addEventListener('click', modal.handleOpenAddClientModal);
+};
 
+const init = () => {
+  table.updateTable();
+  initSortButtons();
+  initSearchField();
+  initAddClientButton();
+};
 
+document.addEventListener('DOMContentLoaded', init);
