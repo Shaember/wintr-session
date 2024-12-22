@@ -18,7 +18,7 @@ const axios = Axios.create({
 let appServer;
 
 beforeAll(async () => {
-  appServer = require('./index');
+  appServer = require('../crm-backend/index');
   return new Promise(resolve => {
     appServer.on('listening', () => resolve());
   });

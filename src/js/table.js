@@ -1,26 +1,40 @@
 import * as basic from './basic.js';
 import * as modal from './modal.js';
-import state from './state.js';
+import state from './state.js'
 
+// --- Таблица ---
+// Обновляет таблицу на странице
 export async function updateTable() {
   const table = document.getElementById('table');
+  const tbody = document.getElementById('table-body');
   const thead = document.getElementById('table-header');
   const searchInput = document.getElementById('search-input');
   const addClientButton = document.getElementById('add-client-button');
   const tableLoadScreen = document.getElementById('table-load-screen');
 
   thead.classList.add('loading');
-  removeExistingTbody();
+  if (tbody) {
+    tbody.remove();
+  }
 
-  toggleLoading(true);
+  tableLoadScreen.hidden = false;
+  addClientButton.hidden = true;
 
   const search = searchInput.value.trim();
   try {
-    const clients = await fetchClients(search);
-    state().clients = clients;
-  } catch (error) {
+    const response = await fetch(`http://localhost:3000/api/clients${search.length > 0 ? `?search=${encodeURIComponent(search)}` : '' }`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if ( !response.ok ) {
+      basic.showError();
+      throw new Error(`Ошибка ${response.status}: ${response.statusText}.`);
+      return;
+    }
+    state().clients = await response.json();
+  } catch(error) {
     basic.showError();
-    console.error(error);
+    throw error;
     return;
   }
 
@@ -33,94 +47,65 @@ export async function updateTable() {
   thead.classList.remove('loading');
 }
 
-function removeExistingTbody() {
-  const tbody = document.getElementById('table-body');
-  if (tbody) {
-    tbody.remove();
-  }
-}
-
-function toggleLoading(isLoading) {
-  const tableLoadScreen = document.getElementById('table-load-screen');
-  const addClientButton = document.getElementById('add-client-button');
-  tableLoadScreen.hidden = !isLoading;
-  addClientButton.hidden = isLoading;
-}
-
-async function fetchClients(search) {
-  const response = await fetch(`http://localhost:3000/api/clients${search.length > 0 ? `?search=${encodeURIComponent(search)}` : '' }`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
-
-  if (!response.ok) {
-    throw new Error(`Ошибка ${response.status}: ${response.statusText}.`);
-  }
-
-  return response.json();
-}
-
+// Создаёт тело таблицы
 function createTableBody(data = []) {
   const tbody = document.createElement('tbody');
   tbody.id = 'table-body';
-  tbody.classList.add('table__body');
+  tbody.classList.add = 'table__body';
 
-  data.forEach(clientData => {
+  data.forEach((clientData) => {
     const tr = createTableRow(clientData);
     tbody.append(tr);
-  });
+  })
 
   return tbody;
 }
 
+// Создаёт строку таблицы
 function createTableRow(clientData) {
   const tr = document.createElement('tr');
   tr.classList.add('table__row', 'table__row_body');
 
-  tr.append(
-    createTableCell('table__cell_body_id', clientData.id),
-    createTableCell('table__cell_body_name', `${clientData.surname} ${clientData.name} ${clientData.lastName}`),
-    createDateCell('table__cell_body_created-at', clientData.createdAt),
-    createDateCell('table__cell_body_updated-at', clientData.updatedAt),
-    createContactsCell(clientData.contacts, clientData.id),
-    createActionsCell(clientData.id)
-  );
+  const tdId = document.createElement('td');
+  tdId.classList.add('table__cell', 'table__cell_body', 'table__cell_body_id');
+  tdId.textContent = clientData.id;
 
-  return tr;
-}
+  const tdName = document.createElement('td');
+  tdName.classList.add('table__cell', 'table__cell_body', 'table__cell_body_name');
+  tdName.textContent = `${clientData.surname} ${clientData.name} ${clientData.lastName}`;
 
-function createTableCell(className, textContent) {
-  const td = document.createElement('td');
-  td.classList.add('table__cell', 'table__cell_body', className);
-  td.textContent = textContent;
-  return td;
-}
+  const tdCreatedAt = document.createElement('td');
+  tdCreatedAt.classList.add('table__cell', 'table__cell_body', 'table__cell_body_created-at');
+  const [tdCreatedAtDate, tdCreatedAtTime] = basic.formatDate(clientData.createdAt).split(' ');
+  tdCreatedAt.textContent = tdCreatedAtDate + ' ';
+  const tdCreatedAtSpan = document.createElement('span');
+  tdCreatedAtSpan.classList.add('text-grey-color');
+  tdCreatedAtSpan.textContent = tdCreatedAtTime;
+  tdCreatedAt.append(tdCreatedAtSpan);
 
-function createDateCell(className, date) {
-  const td = createTableCell(className, basic.formatDate(date).split(' ')[0] + ' ');
-  const span = document.createElement('span');
-  span.classList.add('text-grey-color');
-  span.textContent = basic.formatDate(date).split(' ')[1];
-  td.append(span);
-  return td;
-}
+  const tdUpdatedAt = document.createElement('td');
+  tdUpdatedAt.classList.add('table__cell', 'table__cell_body', 'table__cell_body_updated-at');
+  const [tdUpdatedAtDate, tdUpdatedAtTime] = basic.formatDate(clientData.updatedAt).split(' ');
+  tdUpdatedAt.textContent = tdUpdatedAtDate + ' ';
+  const tdUpdatedAtSpan = document.createElement('span');
+  tdUpdatedAtSpan.classList.add('text-grey-color');
+  tdUpdatedAtSpan.textContent = tdUpdatedAtTime;
+  tdUpdatedAt.append(tdUpdatedAtSpan);
 
-function createContactsCell(contacts, clientId) {
-  const tdContacts = createTableCell('table__cell_body_contacts', '');
-  const divContacts = document.createElement('div');
-  divContacts.classList.add('table__contacts');
-  divContacts.setAttribute('data-element-tableContacts', '');
-  divContacts.setAttribute('data-clientId', clientId);
-  tdContacts.append(divContacts);
+  const tdContacts = document.createElement('td');
+  tdContacts.classList.add('table__cell', 'table__cell_body', 'table__cell_body_contacts');
+  const contacts = document.createElement('div');
+  tdContacts.append(contacts);
+  contacts.classList.add('table__contacts');
+  contacts.setAttribute('data-element-tableContacts', '');
+  contacts.setAttribute('data-clientId', clientData.id);
 
-  renderContacts(divContacts, contacts);
-
-  return tdContacts;
-}
-
-function renderContacts(container, contacts) {
-  const contactsToDraw = contacts.length > 5 ? contacts.slice(0, 4) : contacts;
-
+  let contactsToDraw;
+  if (clientData.contacts.length > 5) {
+    contactsToDraw = clientData.contacts.slice(0, 4);
+  } else {
+    contactsToDraw = clientData.contacts;
+  }
   contactsToDraw.forEach(({ type, value }) => {
     const contact = document.createElement('div');
     contact.classList.add('table__contact');
@@ -129,50 +114,56 @@ function renderContacts(container, contacts) {
     contact.setAttribute('data-contactValue', value);
     contact.addEventListener('mouseover', showContactTooltip);
     contact.addEventListener('mouseout', hideContactTooltip);
-    container.append(contact);
-  });
+    contacts.append(contact);
+  })
 
-  if (contacts.length > 5) {
+  if (clientData.contacts.length > 5) {
     const contactsButton = document.createElement('button');
     contactsButton.classList.add('table__contacts__button');
     contactsButton.setAttribute('data-element-contactsButton', '');
-    contactsButton.textContent = `+${contacts.length - 4}`;
+    contactsButton.textContent = `+${clientData.contacts.length - 4}`;
     contactsButton.addEventListener('click', showAllContacts);
-    container.append(contactsButton);
+    contacts.append(contactsButton);
   }
+
+  const tdActions = document.createElement('td');
+  tdActions.classList.add('table__cell', 'table__cell_body', 'table__cell_body_actions');
+  const actions = document.createElement('div');
+  tdActions.append(actions);
+  actions.classList.add('table__actions');
+
+  const actionEdit = document.createElement('button');
+  actionEdit.classList.add('table__action-button', 'table__action-button_edit', 'button_with-icon');
+  actionEdit.setAttribute('data-element-clientAction', '');
+  actionEdit.setAttribute('data-clientId', clientData.id);
+  const actionEditSpan = document.createElement('span');
+  actionEditSpan.textContent = 'Изменить';
+  actionEdit.append(actionEditSpan);
+  actionEdit.addEventListener('click', modal.handleOpenEditClientModal);
+  actions.append(actionEdit);
+
+  const actionDelete = document.createElement('button');
+  actionDelete.classList.add('table__action-button', 'table__action-button_delete', 'button_with-icon');
+  actionDelete.setAttribute('data-element-clientAction', '');
+  actionDelete.setAttribute('data-clientId', clientData.id);
+  const actionDeleteSpan = document.createElement('span');
+  actionDeleteSpan.textContent = 'Удалить';
+  actionDelete.append(actionDeleteSpan);
+  actionDelete.addEventListener('click', modal.handleOpenDeleteClientModalFromTable);
+  actions.append(actionDelete);
+
+  tr.append(tdId, tdName, tdCreatedAt, tdUpdatedAt, tdContacts, tdActions);
+  return tr;
 }
 
-function createActionsCell(clientId) {
-  const tdActions = createTableCell('table__cell_body_actions', '');
-  const divActions = document.createElement('div');
-  divActions.classList.add('table__actions');
-  tdActions.append(divActions);
-
-  divActions.append(
-    createActionButton('Изменить', 'table__action-button_edit', modal.handleOpenEditClientModal, clientId),
-    createActionButton('Удалить', 'table__action-button_delete', modal.handleOpenDeleteClientModalFromTable, clientId)
-  );
-
-  return tdActions;
-}
-
-function createActionButton(text, className, eventHandler, clientId) {
-  const button = document.createElement('button');
-  button.classList.add('table__action-button', className, 'button_with-icon');
-  button.setAttribute('data-element-clientAction', '');
-  button.setAttribute('data-clientId', clientId);
-  button.textContent = text;
-  button.addEventListener('click', eventHandler);
-  return button;
-}
-
+// --- Контакты пользователя ---
+//Показывает все контакты пользователя
 function showAllContacts(event) {
   const button = event.target.closest('[data-element-contactsButton]');
   button.hidden = true;
   const contactsContainer = button.closest('[data-element-tableContacts]');
-  const contacts = state().clients.find(({ id }) => id === contactsContainer.dataset.clientId).contacts.slice(4);
-
-  contacts.forEach(({ type, value }) => {
+  const contacts = state().clients.find(({ id }) => id === contactsContainer.dataset.clientid).contacts;
+  contacts.slice(4).forEach(({ type, value }) => {
     const contact = document.createElement('div');
     contact.classList.add('table__contact');
     contact.setAttribute('data-element-contact', '');
@@ -181,15 +172,17 @@ function showAllContacts(event) {
     contact.addEventListener('mouseover', showContactTooltip);
     contact.addEventListener('mouseout', hideContactTooltip);
     contactsContainer.append(contact);
-  });
-
-  setTimeout(() => button.remove(), 0);
+  })
+  setTimeout(() => {
+    button.remove();
+  }, 0);
 }
 
+// Показывает подсказку при наведении на контакт
 function showContactTooltip(event) {
   const contact = event.target.closest('[data-element-contact]');
-  const contactType = state().contactTypes[contact.dataset.contactType];
-  const contactValue = contact.dataset.contactValue;
+  const contactType = state().contactTypes[contact.dataset.contacttype];
+  const contactValue = contact.dataset.contactvalue;
 
   const tooltip = document.createElement('div');
   tooltip.classList.add('contact-tooltip');
@@ -197,7 +190,11 @@ function showContactTooltip(event) {
 
   const tooltipText = document.createElement('div');
   tooltipText.classList.add('contact-tooltip__text');
-  tooltipText.textContent = `${contactType}: ${contactValue}`;
+  const text = document.createTextNode(`${contactType}: `);
+  const boldText = document.createElement('span');
+  boldText.classList.add('text-bold');
+  boldText.textContent = contactValue;
+  tooltipText.append(text, boldText);
 
   const triangle = document.createElement('div');
   triangle.classList.add('contact-tooltip__triangle');
@@ -205,19 +202,20 @@ function showContactTooltip(event) {
   tooltip.append(tooltipText, triangle);
   contact.append(tooltip);
 }
-
 function hideContactTooltip(event) {
   const contact = event.target.closest('[data-element-contact]');
   const tooltip = contact.querySelector('[data-element-contactTooltip]');
   tooltip.remove();
 }
 
+// --- Кнопки сортировки ---
+// Обрабатывает нажатие на кнопку сортировки
 export function handleSortButton(event) {
   const button = event.target.closest('[data-element-sortButton]');
-  const sortField = button.dataset.sortField;
-
+  const sortField = button.dataset.sortfield;
   if (sortField === state().sortState.active) {
-    state().sortState.directions[sortField] = state().sortState.directions[sortField] === '0' ? '1' : '0';
+    const currDirection = state().sortState.directions[sortField];
+    state().sortState.directions[sortField] = currDirection === '0' ? '1' : '0';
   } else {
     state().sortState.active = sortField;
   }
@@ -232,13 +230,18 @@ export function handleSortButton(event) {
   }
 }
 
+// Обновляет визуал кнопок сортировки в зависимости от объекта сортировки
 function updateSortButtons(sortState) {
   const { active, directions } = sortState;
   const header = document.getElementById('table-header');
-  const buttons = header.querySelectorAll('[data-element-sortButton]');
 
-  buttons.forEach(button => {
-    button.classList.toggle('active', button.dataset.sortField === active);
-    button.dataset.sortDirection = directions[button.dataset.sortField];
+  const buttons = header.querySelectorAll('[data-element-sortButton]');
+  buttons.forEach((button) => {
+    if (button.dataset.sortfield === active) {
+      button.classList.add('active');
+    } else {
+      button.classList.remove('active');
+    }
+    button.dataset.sortdirection = directions[button.dataset.sortfield];
   });
 }
