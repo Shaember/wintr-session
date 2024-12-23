@@ -2,8 +2,8 @@ import * as basic from './basic.js';
 import * as modal from './modal.js';
 import state from './state.js'
 
-// --- Таблица ---
-// Обновляет таблицу на странице
+// Таблица 
+// Обновляет таблицу
 export async function updateTable() {
   const table = document.getElementById('table');
   const tbody = document.getElementById('table-body');
@@ -47,7 +47,7 @@ export async function updateTable() {
   thead.classList.remove('loading');
 }
 
-// Создаёт тело таблицы
+// тело таблицы
 function createTableBody(data = []) {
   const tbody = document.createElement('tbody');
   tbody.id = 'table-body';
@@ -61,7 +61,7 @@ function createTableBody(data = []) {
   return tbody;
 }
 
-// Создаёт строку таблицы
+// строка таблицы
 function createTableRow(clientData) {
   const tr = document.createElement('tr');
   tr.classList.add('table__row', 'table__row_body');
@@ -156,7 +156,7 @@ function createTableRow(clientData) {
   return tr;
 }
 
-// --- Контакты пользователя ---
+// Контакты пользователя
 //Показывает все контакты пользователя
 function showAllContacts(event) {
   const button = event.target.closest('[data-element-contactsButton]');
@@ -178,7 +178,7 @@ function showAllContacts(event) {
   }, 0);
 }
 
-// Показывает подсказку при наведении на контакт
+// подсказка при наведении на контакт
 function showContactTooltip(event) {
   const contact = event.target.closest('[data-element-contact]');
   const contactType = state().contactTypes[contact.dataset.contacttype];
